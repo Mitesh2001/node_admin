@@ -1,14 +1,12 @@
 import express, { Request, Response } from 'express';
 import { routes } from './routes';
-import bodyParser from "body-parser";
-
 
 const app = express();
+const port = 8001
 
+app.use(express.json());
 routes(app);
-app.use(bodyParser.json());
 
-
-app.listen(8000, () => {
-    console.log('Listenign port 8000')
+app.listen(port, () => {
+    console.log(`Listenign port ${port}`)
 })
