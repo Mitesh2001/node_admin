@@ -1,0 +1,12 @@
+{
+    "type" : "mysql",
+    "host" : "localhost",
+    "username" : "mitesh",
+    "password" : "admin",
+    "database" : "node_admin",
+    "logging" : false,
+    "synchronize" : true,
+    "entities" : [
+        "src/entity/*.ts"
+    ]
+}
