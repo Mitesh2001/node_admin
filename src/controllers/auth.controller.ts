@@ -3,7 +3,7 @@ import { RegisterValidation } from "../validations/register.validation"
 import { getManager } from "typeorm";
 import { User } from "../entity/user.entity";
 import bcryptjs from "bcryptjs";
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 
 export const Register = async ( request : Request, response : Response) =>  {
 
@@ -31,9 +31,9 @@ export const Register = async ( request : Request, response : Response) =>  {
 
 export const Login = async ( request : Request, response : Response) =>  { 
 
-    const repository = getManager().getRepository(User);
+    const userRepository = getManager().getRepository(User);
 
-    const {password, ...user} = await repository.findOne({ where : { email : request.body.email } });
+    const {password, ...user} = await userRepository.findOne({ where : { email : request.body.email } });
 
     if (!user) {
         return response.status(400).send({
@@ -59,5 +59,25 @@ export const Login = async ( request : Request, response : Response) =>  {
     })
 
     return response.send(user)
+
+}
+
+export const AuthUser = async ( request : Request, response : Response) =>  {
+    
+    const jwt = request.cookies['jwt']
+    
+    const payload : any = verify(jwt, "secret");
+
+    if (!payload) {
+        return response.status(400).send({
+            message: 'Unauthenticated !'
+        })
+    }
+
+    const userRepository = getManager().getRepository(User)
+
+    const {password, ...user} = await userRepository.findOne({ where : { id : payload.id } })
+
+    response.send(user)
 
 }
