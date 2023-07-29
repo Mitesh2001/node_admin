@@ -33,7 +33,7 @@ export const Login = async ( request : Request, response : Response) =>  {
 
     const userRepository = getManager().getRepository(User);
 
-    const {password, ...user} = await userRepository.findOne({ where : { email : request.body.email } });
+    const user = await userRepository.findOne({ where : { email : request.body.email } });
 
     if (!user) {
         return response.status(400).send({
@@ -41,13 +41,13 @@ export const Login = async ( request : Request, response : Response) =>  {
         })
     }
 
-    if (!await bcryptjs.compare(request.body.password, password)) {
+    if (!await bcryptjs.compare(request.body.password, user.password)) {
         return response.status(400).send({
             message: 'invalid credentials!'
         })
     }
 
-    const token = sign({id: user.id}, "secret");
+    const token = sign({id: user.id}, process.env.JWT_SECRET_KEY);
 
     response.cookie('jwt', token, {
         httpOnly: true,
@@ -58,26 +58,45 @@ export const Login = async ( request : Request, response : Response) =>  {
         message: 'success'
     })
 
-    return response.send(user)
-
 }
 
 export const AuthUser = async ( request : Request, response : Response) =>  {
     
-    const jwt = request.cookies['jwt']
+    try {
+        
+        const jwt = request.cookies['jwt']
+        
+        const payload : any = verify(jwt, process.env.JWT_SECRET_KEY);
     
-    const payload : any = verify(jwt, "secret");
+        if (!payload) {
+            return response.status(400).send({
+                message: 'Unauthenticated !'
+            })
+        }
+    
+        const userRepository = getManager().getRepository(User)
+    
+        const {password, ...user} = await userRepository.findOne({ where : { id : payload.id } })
+    
+        response.send(user)
 
-    if (!payload) {
+    } catch (error) {
         return response.status(400).send({
             message: 'Unauthenticated !'
         })
     }
 
-    const userRepository = getManager().getRepository(User)
 
-    const {password, ...user} = await userRepository.findOne({ where : { id : payload.id } })
+}
 
-    response.send(user)
+export const LogOut = async ( request : Request, response : Response) =>  {
+    
+    response.cookie('jwt', "", {
+        maxAge: 0
+    })
+
+    response.send({
+        message: 'success'
+    })
 
 }
