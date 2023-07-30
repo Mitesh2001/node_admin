@@ -51,7 +51,7 @@ export const Login = async ( request : Request, response : Response) =>  {
 
     response.cookie('jwt', token, {
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 1day
+        maxAge: 24 * 60 * 60 * 1000
     })
 
     response.send({
@@ -60,34 +60,7 @@ export const Login = async ( request : Request, response : Response) =>  {
 
 }
 
-export const AuthUser = async ( request : Request, response : Response) =>  {
-    
-    try {
-        
-        const jwt = request.cookies['jwt']
-        
-        const payload : any = verify(jwt, process.env.JWT_SECRET_KEY);
-    
-        if (!payload) {
-            return response.status(400).send({
-                message: 'Unauthenticated !'
-            })
-        }
-    
-        const userRepository = getManager().getRepository(User)
-    
-        const {password, ...user} = await userRepository.findOne({ where : { id : payload.id } })
-    
-        response.send(user)
-
-    } catch (error) {
-        return response.status(400).send({
-            message: 'Unauthenticated !'
-        })
-    }
-
-
-}
+export const AuthUser = async ( request : Request, response : Response) => response.send(request['user'])
 
 export const LogOut = async ( request : Request, response : Response) =>  {
     
