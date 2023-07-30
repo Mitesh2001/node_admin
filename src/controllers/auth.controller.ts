@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
 import { RegisterValidation } from "../validations/register.validation"
-import { getManager } from "typeorm";
-import { User } from "../entity/user.entity";
-import bcryptjs from "bcryptjs";
-import { sign, verify } from "jsonwebtoken";
+import { getManager } from "typeorm"
+import { User } from "../entity/user.entity"
+import bcryptjs from "bcryptjs"
+import { sign, verify } from "jsonwebtoken"
 
 export const Register = async ( request : Request, response : Response) =>  {
 
@@ -33,7 +33,7 @@ export const Login = async ( request : Request, response : Response) =>  {
 
     const userRepository = getManager().getRepository(User);
 
-    const user = await userRepository.findOne({ where : { email : request.body.email } });
+    const user = await userRepository.findOne({ where : { email : request.body.email } })
 
     if (!user) {
         return response.status(400).send({
@@ -47,7 +47,7 @@ export const Login = async ( request : Request, response : Response) =>  {
         })
     }
 
-    const token = sign({id: user.id}, process.env.JWT_SECRET_KEY);
+    const token = sign({id: user.id}, process.env.JWT_SECRET_KEY)
 
     response.cookie('jwt', token, {
         httpOnly: true,
@@ -72,4 +72,40 @@ export const LogOut = async ( request : Request, response : Response) =>  {
         message: 'success'
     })
 
+}
+
+export const UpdateInfo = async ( request : Request, response : Response) =>  { 
+
+    const authUser = request['user']
+
+    const userRepository = getManager().getRepository(User)
+
+    await userRepository.update(authUser.id,request.body)
+
+    const { password, ...data } = await userRepository.findOne({ where : { id : authUser.id } })
+
+    response.send(data)
+    
+}
+
+export const UpdatePassword = async ( request : Request, response : Response) =>  { 
+
+    const authUser = request['user']
+
+    const userRepository = getManager().getRepository(User)
+
+    request.body.password !== request.body.password_confirm && response.status(400).send({
+        message : "Password doesn't match !"
+    })
+
+    await userRepository.update(authUser.id,{
+        password : await bcryptjs.hash(request.body.password,10)
+    })
+
+    const { password, ...data } = await userRepository.findOne({ where : { id : authUser.id } })
+
+    response.send({
+        message: 'success'
+    })
+    
 }
