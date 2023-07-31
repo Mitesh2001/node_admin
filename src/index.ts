@@ -7,14 +7,14 @@ import cookieParser from 'cookie-parser';
 createConnection().then(connection => {
 
     const app = express()
-    const port = 8001
+    const port = process.env.PORT
     
     app.use(express.json())
     app.use(cookieParser())
     routes(app)
     
     app.listen(port, () => {
-        console.log(`Listenign port ${port}`)
+        console.log(`Listening port ${port}`)
     })
 
 })
