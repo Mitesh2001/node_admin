@@ -7,7 +7,9 @@ export const Users = async (request: Request, response: Response) => {
 
     const userRepository = getManager().getRepository(User)
 
-    const users = await userRepository.find()
+    const users = await userRepository.find({
+        relations: ['role']
+    })
 
     response.send(users.map(user => {
         delete user.password
@@ -25,7 +27,10 @@ export const CreateUser = async (request: Request, response: Response) => {
 
     const { password, ...user } = await userRepository.save({
         ...body,
-        password: hasedPassword
+        password: hasedPassword,
+        role: {
+            id: role_id
+        }
     })
 
     response.send(user)
@@ -38,7 +43,7 @@ export const GetUser = async (request: Request, response: Response) => {
 
         const userRepository = getManager().getRepository(User)
 
-        const { password, ...user } = await userRepository.findOne({ where: { id: parseInt(request.params.id) } })
+        const { password, ...user } = await userRepository.findOne({ where: { id: parseInt(request.params.id) }, relations: ['role'] })
 
         response.send(user)
 
@@ -54,11 +59,18 @@ export const UpdateUser = async (request: Request, response: Response) => {
 
     try {
 
+        const { role_id, ...body } = request.body
+
         const userRepository = getManager().getRepository(User)
 
-        await userRepository.update(request.params.id, request.body)
+        await userRepository.update(request.params.id, {
+            ...body,
+            role: {
+                id: role_id
+            }
+        })
 
-        const { password, ...user } = await userRepository.findOne({ where: { id: parseInt(request.params.id) } })
+        const { password, ...user } = await userRepository.findOne({ where: { id: parseInt(request.params.id) }, relations: ['role'] })
 
         response.send(user)
 
