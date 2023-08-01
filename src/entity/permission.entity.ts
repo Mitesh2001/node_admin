@@ -7,5 +7,5 @@ export class Permission {
     id: number
 
     @Column()
-    name: number
+    name: string
 }
