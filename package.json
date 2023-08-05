@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "roles:seed": "ts-node src/seeder/role.seeder.ts"
+    "roles:seed": "ts-node src/seeder/role.seeder.ts",
+    "products:seed": "ts-node src/seeder/product.seeder.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",

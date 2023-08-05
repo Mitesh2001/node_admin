@@ -3,12 +3,26 @@ import { Request, Response } from "express"
 import { Product } from "../entity/product.entity"
 
 export const Products = async (request: Request, response: Response) => {
+    
+    const page = parseInt(request.query.page as string || '1')
+    
+    const take = 15;
 
     const productRepository = getManager().getRepository(Product)
 
-    const products = await productRepository.find()
+    const [ data, total ] = await productRepository.findAndCount({
+        take,
+        skip : ( page - 1 ) * take
+    })
 
-    response.send(products)
+    response.send({
+        data,
+        meta : {
+            total,
+            page,
+            last_page : Math.ceil( total / take )
+        }
+    })
 
 }
 
