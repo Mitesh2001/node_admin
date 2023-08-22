@@ -9,7 +9,7 @@ createConnection().then(async connection => {
     const orderItemRepository = getManager().getRepository(OrderItem)
 
     for (let i = 0; i < 30; i++) {
-        
+
         const order = await orderRepository.save({
             first_name: faker.person.firstName(),
             last_name : faker.person.lastName(),
@@ -21,10 +21,11 @@ createConnection().then(async connection => {
                 product_title : faker.lorem.word(10),
                 price : randomInt(10,100),
                 quantity : randomInt(1,5),
-                order
+                order,
+                created_at : faker.date.past({ years: 10 }).toDateString()
             })
         }
-        
+
     }
 
     process.exit(0)

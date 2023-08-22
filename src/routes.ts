@@ -6,7 +6,7 @@ import { Permissions } from "./controllers/permission.controller"
 import { GetRole, Roles, UpdateRole, createRole } from "./controllers/role.controller"
 import { CreateProduct, DeleteProduct, GetProduct, Products, UpdateProduct } from "./controllers/product.controller"
 import { Upload } from "./controllers/image.controller"
-import { Orders } from "./controllers/order.controller";
+import { Orders, Export } from "./controllers/order.controller";
 
 export const routes = (router : Router) => {
     router.post('/api/register', Register)
@@ -39,4 +39,5 @@ export const routes = (router : Router) => {
     router.use('/api/uploads', express.static('./uploads'));
 
     router.get('/api/orders', AuthMiddleware, Orders);
+    router.post('/api/export-orders', AuthMiddleware, Export);
 }
