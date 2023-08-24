@@ -52,20 +52,11 @@ export const Export = async (request: Request, response: Response) => {
 
     orders.forEach((order : Order) => {
 
-        json.push({
-            ID: order.id,
-            Name: order.name,
-            Email: order.email,
-            'Product Title': '',
-            Price: '',
-            Quantity: ''
-        })
-
-        order.order_item.forEach((item : OrderItem) => {
+        order.order_item.forEach((item : OrderItem, i : number) => {
             json.push({
-                ID: '',
-                Name: '',
-                Email: '',
+                ID: i == 0 ? order.id : '',
+                Name: i == 0 ? order.name : '',
+                Email: i == 0 ? order.email : '',
                 'Product Title': item.product_title,
                 Price: item.price,
                 Quantity: item.quantity
@@ -79,4 +70,18 @@ export const Export = async (request: Request, response: Response) => {
     response.attachment('orders.csv');
     response.send(csv);
 
+}
+
+export const Chart = async (request: Request, response: Response) => {
+
+    const manager = getManager();
+    const result = await manager.query(`
+        SELECT DATE_FORMAT(o.created_at, '%Y-%m-%d') as date, SUM(oi.price * oi.quantity) as sum
+        FROM \`order\` o
+            JOIN order_item oi
+        on o.id = oi.order_id
+        GROUP BY date
+    `);
+
+    response.send(result);
 }

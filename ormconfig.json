@@ -1,8 +1,8 @@
 {
     "type" : "mysql",
     "host" : "localhost",
-    "username" : "mitesh",
-    "password" : "admin",
+    "username" : "root",
+    "password" : "Mysql@123",
     "database" : "node_admin",
     "logging" : false,
     "synchronize" : true,
